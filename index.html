@@ -207,6 +207,65 @@
     color: var(--chili);
   }
 
+  .visit {
+    background: white;
+    border-radius: 24px;
+    padding: 60px 40px;
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 40px;
+    align-items: stretch;
+  }
+
+  .visit-map iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    border-radius: 18px;
+    border: 0;
+  }
+
+  .visit-details h3 {
+    color: var(--chili);
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+  }
+
+  .visit-details h3:not(:first-child) {
+    margin-top: 24px;
+  }
+
+  .visit-details p {
+    color: #4a3628;
+  }
+
+  .hours-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    color: #4a3628;
+  }
+
+  .hours-table td {
+    padding: 8px 0;
+    border-bottom: 1px solid #f1e2d0;
+  }
+
+  .hours-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .hours-table td:last-child {
+    text-align: right;
+    font-weight: bold;
+    color: var(--ink);
+  }
+
+  @media (max-width: 700px) {
+    .visit { grid-template-columns: 1fr; }
+  }
+
   footer {
     background: var(--ink);
     color: #f4e9dc;
@@ -313,6 +372,29 @@
       <p>비건 메뉴도 이렇게 맛있을 수 있다니, 친구들이랑 재방문 확정입니다.</p>
       <div class="name">- 이서연</div>
     </div>
+  </div>
+</section>
+
+<section class="visit">
+  <div class="visit-map">
+    <iframe
+      src="https://www.google.com/maps?q=서울특별시&output=embed"
+      width="100%"
+      height="320"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+  </div>
+  <div class="visit-details">
+    <h2 class="section-title" style="text-align:left; margin-bottom:20px;">오시는 길</h2>
+    <h3>주소</h3>
+    <p>서울특별시 어딘가 타코로 123길 45</p>
+    <h3>영업시간</h3>
+    <table class="hours-table">
+      <tr><td>월 - 목</td><td>11:00 - 21:00</td></tr>
+      <tr><td>금 - 토</td><td>11:00 - 22:00</td></tr>
+      <tr><td>일요일</td><td>12:00 - 20:00</td></tr>
+    </table>
   </div>
 </section>
 
