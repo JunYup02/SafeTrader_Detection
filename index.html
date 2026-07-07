@@ -56,9 +56,15 @@
     font-size: 1.1rem;
     box-shadow: 0 6px 20px rgba(0,0,0,0.25);
     transition: transform 0.2s ease;
+    animation: float 2.5s ease-in-out infinite;
   }
 
-  .cta-btn:hover { transform: translateY(-3px); }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .cta-btn:hover { animation-play-state: paused; transform: translateY(-3px); }
 
   .wave {
     position: absolute;
