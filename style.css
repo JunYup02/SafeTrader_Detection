@@ -61,6 +61,20 @@ nav {
   margin-bottom: 1rem;
 }
 
+.spin-title {
+  display: inline-block;
+  animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .hero-content p {
   font-size: 1.25rem;
   margin-bottom: 2rem;
