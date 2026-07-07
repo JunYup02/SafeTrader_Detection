@@ -1,0 +1,131 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #2b1c14;
+  line-height: 1.6;
+}
+
+.hero {
+  background: linear-gradient(135deg, #e8552e, #f2a03d);
+  color: #fff;
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-links a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav-links a:hover {
+  text-decoration: underline;
+}
+
+.hero-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+.hero-content h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.hero-content p {
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.btn {
+  background: #2b1c14;
+  color: #fff;
+  padding: 0.9rem 2rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: transform 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+section {
+  padding: 4rem 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+section h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #e8552e;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.menu-item {
+  background: #fff8f0;
+  border: 1px solid #f2d9c4;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.menu-item h3 {
+  color: #2b1c14;
+  margin-bottom: 0.5rem;
+}
+
+.price {
+  display: inline-block;
+  margin-top: 0.75rem;
+  font-weight: bold;
+  color: #e8552e;
+}
+
+.about, .contact {
+  text-align: center;
+}
+
+footer {
+  background: #2b1c14;
+  color: #fff;
+  text-align: center;
+  padding: 1.5rem;
+}
