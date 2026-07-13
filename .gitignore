@@ -1,0 +1,14 @@
+# 재생성 가능한 정제 데이터 (EDA 노트북 실행 시 재생성됨)
+datasets/difraud_data_cleaned.csv
+datasets/Fraudulent_E-Commerce_Transaction_Data_cleaned.csv
+
+# 재생성 가능한 변환 데이터 (jsonl_to_csv.py 실행 시 재생성됨)
+datasets/difraud_data_csv/
+
+# GitHub 100MB 파일 제한 초과 - Kaggle에서 별도 다운로드 필요 (README 참고)
+datasets/Fraudulent_E-Commerce_Transaction_Data/Fraudulent_E-Commerce_Transaction_Data.csv
+
+# Jupyter / OS / 에디터 잡파일
+.ipynb_checkpoints/
+.DS_Store
+.vscode/
