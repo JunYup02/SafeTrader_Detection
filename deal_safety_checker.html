@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deal Safety Checker — Is This Deal Safe?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #3d3226;
+    --muted: #8a7a68;
+    --cream: #fff8f0;
+    --card: #ffffff;
+    --border: #f1e4d2;
+    --coral: #ff6b5b;
+    --coral-dark: #e2503f;
+    --peach: #ffb199;
+    --mint: #14b8a6;
+    --mint-dark: #0d9488;
+    --mint-bg: #e6faf6;
+    --sunny: #f5a524;
+    --sunny-bg: #fff8e6;
+    --danger: #d9463a;
+    --danger-bg: #fff0ee;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+  h1, h2, .verdict-title, .analyze-btn {
+    font-family: 'Baloo 2', 'Segoe UI', system-ui, sans-serif;
+  }
+
+  header {
+    background: linear-gradient(135deg, var(--coral), var(--peach));
+    color: #fff;
+    padding: 3rem 1.5rem 4rem;
+    text-align: center;
+  }
+  header .tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.22);
+    padding: 0.35rem 1rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin-bottom: 1.1rem;
+  }
+  header h1 { font-size: clamp(1.8rem, 4.5vw, 2.7rem); margin: 0 0 0.7rem; font-weight: 800; }
+  header p { max-width: 600px; margin: 0 auto; opacity: 0.95; font-size: 1.05rem; }
+
+  main {
+    max-width: 880px;
+    margin: -2.25rem auto 3rem;
+    padding: 0 1.25rem;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 1.85rem;
+    box-shadow: 0 10px 30px rgba(255,107,91,0.08);
+    margin-bottom: 1.5rem;
+  }
+
+  .card h2 {
+    font-size: 1.15rem;
+    margin: 0 0 1.1rem;
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .card .subhead {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin: -0.75rem 0 1.25rem;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.35rem;
+  }
+  .field { margin-bottom: 1.1rem; }
+  input[type="text"], input[type="number"], select, textarea {
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    background: var(--cream);
+    color: var(--ink);
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--mint);
+    box-shadow: 0 0 0 4px rgba(20,184,166,0.14);
+    background: #fff;
+  }
+  textarea { resize: vertical; min-height: 160px; }
+  .hint { font-size: 0.8rem; color: var(--muted); margin-top: 0.35rem; }
+
+  .analyze-btn {
+    display: block;
+    width: 100%;
+    padding: 0.95rem;
+    background: linear-gradient(135deg, var(--coral), var(--coral-dark));
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(255,107,91,0.32);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .analyze-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(255,107,91,0.4); }
+  .analyze-btn:active { transform: translateY(0); }
+
+  #reportSection { display: none; }
+
+  .verdict-banner {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    border-radius: 18px;
+    padding: 1.4rem 1.6rem;
+    margin-bottom: 1.5rem;
+    border: 2px solid;
+  }
+  .verdict-banner .icon { font-size: 2.4rem; line-height: 1; }
+  .verdict-banner .verdict-title { font-size: 1.4rem; font-weight: 700; margin: 0 0 0.2rem; }
+  .verdict-banner .verdict-sub { font-size: 0.9rem; opacity: 0.9; }
+  .verdict-proceed { background: var(--mint-bg); border-color: #99e6d9; color: var(--mint-dark); }
+  .verdict-caution { background: var(--sunny-bg); border-color: #f6d896; color: #92600a; }
+  .verdict-stop { background: var(--danger-bg); border-color: #f5c2bc; color: var(--danger); }
+
+  .scam-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
+  .scam-tag {
+    background: var(--danger-bg);
+    color: var(--danger);
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+  }
+  .scam-tag.none { background: var(--mint-bg); color: var(--mint-dark); }
+
+  .reason-list { margin: 0; padding-left: 0; list-style: none; }
+  .reason-list li {
+    margin-bottom: 0.6rem;
+    font-size: 0.92rem;
+    color: var(--ink);
+    padding-left: 1.6rem;
+    position: relative;
+  }
+  .reason-list li::before {
+    content: "💬";
+    position: absolute;
+    left: 0;
+    top: 0.05rem;
+    font-size: 0.85rem;
+  }
+  .reason-list li b { color: var(--coral-dark); }
+
+  .chat-render {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.1rem 1.25rem;
+    font-size: 0.94rem;
+    white-space: pre-wrap;
+  }
+  .chat-line { display: block; padding: 0.2rem 0; }
+  .flag-sentence {
+    border-radius: 8px;
+    padding: 0.1rem 0.45rem;
+    cursor: help;
+    font-weight: 600;
+  }
+  .flag-high { background: #ffe0db; color: #a83226; }
+  .flag-med { background: #fff1c9; color: #8a5c07; }
+
+  .legend { display: flex; gap: 1.2rem; margin-top: 0.9rem; font-size: 0.82rem; color: var(--muted); flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+  .checklist { list-style: none; margin: 0; padding: 0; }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: 0.94rem;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li .check {
+    background: var(--mint-bg);
+    color: var(--mint-dark);
+    font-weight: 700;
+    width: 1.5rem;
+    height: 1.5rem;
+    min-width: 1.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+  }
+
+  footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="tag">🛡️ Built for buyers new to US marketplaces</span>
+  <h1>Is This Deal Safe?</h1>
+  <p>New to Facebook Marketplace, Craigslist, or OfferUp? Paste your chat below and we'll point out anything sketchy in plain English — before you send a single dollar.</p>
+</header>
+
+<main>
+  <section class="card">
+    <h2>Tell us about the deal 📝</h2>
+    <div class="grid-2">
+      <div class="field">
+        <label for="platform">Where are you buying this?</label>
+        <select id="platform">
+          <option>Facebook Marketplace</option>
+          <option>Craigslist</option>
+          <option>OfferUp</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="itemType">What are you buying?</label>
+        <input type="text" id="itemType" placeholder="e.g. MacBook Air 2022">
+      </div>
+      <div class="field">
+        <label for="salePrice">Price they're asking (USD)</label>
+        <input type="number" id="salePrice" placeholder="e.g. 350" min="0">
+      </div>
+      <div class="field">
+        <label for="marketPrice">What it's usually worth (USD)</label>
+        <input type="number" id="marketPrice" placeholder="e.g. 700" min="0">
+        <div class="hint">A rough guess is fine — just what you'd expect to pay elsewhere.</div>
+      </div>
+      <div class="field">
+        <label for="paymentMethod">How do they want you to pay?</label>
+        <select id="paymentMethod">
+          <option value="cash">Cash</option>
+          <option value="paypal_gs">PayPal (Goods &amp; Services)</option>
+          <option value="paypal_ff">PayPal (Friends &amp; Family)</option>
+          <option value="zelle">Zelle</option>
+          <option value="venmo">Venmo</option>
+          <option value="cashapp">Cash App</option>
+          <option value="wire">Wire Transfer</option>
+          <option value="giftcard">Gift Card</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="txnMethod">How are you getting the item?</label>
+        <select id="txnMethod">
+          <option value="in_person">Meeting in person</option>
+          <option value="shipping">Getting it shipped</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="chatText">Paste your conversation with the seller</label>
+      <textarea id="chatText" placeholder="Paste the chat here, one message per line...&#10;e.g.&#10;Seller: I can hold it if you send a $50 deposit via Zelle first&#10;Seller: I'm out of town this week so I'll ship it once you pay"></textarea>
+    </div>
+    <button class="analyze-btn" id="analyzeBtn">Check My Deal 🔍</button>
+  </section>
+
+  <section id="reportSection">
+    <section class="card">
+      <h2>Your Deal Safety Report</h2>
+      <div class="verdict-banner" id="verdictBanner">
+        <div class="icon" id="verdictIcon"></div>
+        <div>
+          <div class="verdict-title" id="verdictTitle"></div>
+          <div class="verdict-sub" id="verdictSub"></div>
+        </div>
+      </div>
+
+      <h2 style="font-size:1rem;">This looks like... 🕵️</h2>
+      <div class="scam-tags" id="scamTags"></div>
+
+      <h2 style="font-size:1rem; margin-top:1.4rem;">Here's why</h2>
+      <ul class="reason-list" id="reasonList"></ul>
+    </section>
+
+    <section class="card">
+      <h2>Your chat, with the risky parts marked 🚩</h2>
+      <div class="chat-render" id="chatRender"></div>
+      <div class="legend">
+        <span>🚩 Big red flag</span>
+        <span>👀 Worth a second look</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Before you go any further ✅</h2>
+      <p class="subhead">A few things to double-check no matter what your score says.</p>
+      <ul class="checklist" id="checklist"></ul>
+    </section>
+  </section>
+</main>
+
+<footer>
+  Made for students and newcomers navigating US marketplaces for the first time 💛 Not legal or financial advice — when something feels off, trust that feeling and walk away.
+</footer>
+
+<script>
+  // ---- Scam signal pattern library ----
+  const RISK_CATEGORIES = [
+    {
+      id: 'advance_payment',
+      label: 'Advance Payment / Deposit Scam',
+      weight: 30,
+      severity: 'high',
+      patterns: [
+        /deposit/i, /hold (it|this|the item) for you/i, /reserve (it|the item)/i,
+        /send (me )?(the )?money first/i, /before (we|i) (can )?meet/i, /secure the item/i,
+        /send half (now|upfront)/i, /pay (in advance|upfront|first)/i, /down ?payment/i
+      ],
+      reason: 'Sellers who ask you to pay before you see or receive the item are using a classic advance-payment scam — once you pay, they stop responding.'
+    },
+    {
+      id: 'verification_code',
+      label: 'Verification Code Scam',
+      weight: 35,
+      severity: 'high',
+      patterns: [
+        /verification code/i, /confirmation code/i, /(sent|texted|send) you a code/i,
+        /\botp\b/i, /\d-digit code/i, /code i ('?ve )?(just )?sent/i, /read (me|out) the code/i,
+        /share (that|the) code/i
+      ],
+      reason: 'Scammers ask you to forward a "verification" code that is actually a real login or payment approval code — sharing it lets them take over your account or payment.'
+    },
+    {
+      id: 'off_platform_payment',
+      label: 'Irreversible / Off-Platform Payment',
+      weight: 20,
+      severity: 'high',
+      patterns: [
+        /\bzelle\b/i, /\bvenmo\b/i, /cash ?app/i, /wire transfer/i, /gift ?card/i,
+        /friends and family/i, /western union/i, /moneygram/i
+      ],
+      reason: 'Zelle, Venmo/Cash App (friends & family), gift cards, and wire transfers send money instantly with no buyer protection and cannot be reversed.'
+    },
+    {
+      id: 'avoid_meeting',
+      label: 'Avoiding In-Person Meeting',
+      weight: 25,
+      severity: 'high',
+      patterns: [
+        /can'?t meet in person/i, /i'?m\s+(?:\w+\s+){0,2}(out of town|deployed|overseas|on a trip|in the military)/i,
+        /my (agent|assistant|driver|cousin) will (pick up|deliver|meet you)/i, /shipping only/i,
+        /i'?m not (available|around) to meet/i, /unable to meet/i
+      ],
+      reason: 'A legitimate local seller can usually meet in person. Excuses to avoid meeting are common in shipping and military-relocation scams.'
+    },
+    {
+      id: 'fake_shipping',
+      label: 'Fake Shipping Scam',
+      weight: 25,
+      severity: 'high',
+      patterns: [
+        /i'?ll ship (it )?once (you|i) (pay|receive)/i, /use my (own )?shipping label/i,
+        /tracking (number|info|link) after (payment|you pay)/i, /courier will deliver/i,
+        /my own shipping company/i, /shipping agent/i
+      ],
+      reason: 'Promises to ship "after payment" with no verifiable tracking are a common way sellers take money without ever sending the item.'
+    },
+    {
+      id: 'urgency_pressure',
+      label: 'Urgency / Pressure Tactics',
+      weight: 10,
+      severity: 'med',
+      patterns: [
+        /need to sell (it )?today/i, /another buyer is interested/i, /act fast/i,
+        /first (come|to send( the)? money)/i, /i have other offers/i, /hurry/i
+      ],
+      reason: 'Artificial urgency is used to stop you from thinking carefully or verifying details before paying.'
+    }
+  ];
+
+  const PAYMENT_RISK = {
+    cash: 0, paypal_gs: 0, paypal_ff: 15, zelle: 15, venmo: 15,
+    cashapp: 15, wire: 20, giftcard: 25, other: 10
+  };
+
+  const SAFETY_CHECKLIST = [
+    "Meet somewhere public and well-lit — a police station's 'safe exchange' spot is perfect if your area has one.",
+    "Don't pay a single cent until you've seen and checked out the item with your own eyes.",
+    "Never share a verification code (OTP) with anyone, even if they sound official — no real seller ever needs it.",
+    "Steer clear of Zelle, Venmo, Cash App, gift cards, or wire transfers with people you don't know — once it's sent, it's gone for good.",
+    "Paying with PayPal? Always pick Goods & Services, not Friends & Family, so you're actually protected.",
+    "If the price feels too good to be true, it probably is — that instinct is usually right.",
+    "If a seller won't meet up and insists on shipping only, slow down and ask more questions."
+  ];
+
+  function splitIntoSentences(text) {
+    const lines = text.split(/\n+/);
+    const sentences = [];
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      const parts = trimmed.split(/(?<=[.!?])\s+(?=[A-Z0-9])/);
+      for (const p of parts) {
+        const s = p.trim();
+        if (s) sentences.push(s);
+      }
+    }
+    return sentences;
+  }
+
+  function analyzeChat(chatText) {
+    const sentences = splitIntoSentences(chatText);
+    const categoryHits = {};
+    const flaggedSentences = [];
+
+    for (const sentence of sentences) {
+      let bestMatch = null;
+      for (const cat of RISK_CATEGORIES) {
+        if (cat.patterns.some(re => re.test(sentence))) {
+          categoryHits[cat.id] = (categoryHits[cat.id] || 0) + 1;
+          if (!bestMatch || cat.weight > bestMatch.weight) bestMatch = cat;
+        }
+      }
+      flaggedSentences.push({ text: sentence, category: bestMatch });
+    }
+
+    return { sentences: flaggedSentences, categoryHits };
+  }
+
+  function computeReport(inputs) {
+    const { chatText, salePrice, marketPrice, paymentMethod, txnMethod } = inputs;
+    const { sentences, categoryHits } = analyzeChat(chatText);
+
+    let score = 0;
+    const reasons = [];
+    const matchedCategories = [];
+
+    for (const cat of RISK_CATEGORIES) {
+      const hits = categoryHits[cat.id] || 0;
+      if (hits > 0) {
+        const bonus = Math.min((hits - 1) * 5, 15);
+        score += cat.weight + bonus;
+        matchedCategories.push({ ...cat, hits });
+        reasons.push(`<b>${cat.label}</b> showed up in your chat (${hits} sentence${hits > 1 ? 's' : ''}) — ${cat.reason}`);
+      }
+    }
+
+    if (salePrice > 0 && marketPrice > 0) {
+      const ratio = salePrice / marketPrice;
+      if (ratio < 0.3) {
+        score += 25;
+        reasons.push(`<b>The price is really low</b> — it's less than 30% of what this usually sells for ($${salePrice} vs ~$${marketPrice}), which is a classic bait tactic.`);
+      } else if (ratio < 0.5) {
+        score += 15;
+        reasons.push(`<b>The price looks too good to be true</b> — it's under half of what this usually sells for ($${salePrice} vs ~$${marketPrice}).`);
+      }
+    }
+
+    const paymentRisk = PAYMENT_RISK[paymentMethod] ?? 0;
+    if (paymentRisk > 0) {
+      score += paymentRisk;
+      const label = document.getElementById('paymentMethod').selectedOptions[0].text;
+      reasons.push(`<b>The payment method they asked for (${label})</b> gives you little to no protection and is hard to get back once it's sent.`);
+    }
+
+    if (txnMethod === 'shipping' && (categoryHits['advance_payment'] || categoryHits['fake_shipping'])) {
+      score += 10;
+      reasons.push(`<b>Shipping-only plus prepayment red flags</b> makes this riskier since you can't check the item before paying.`);
+    }
+
+    score = Math.min(score, 100);
+
+    let verdict;
+    if (score >= 55) verdict = 'stop';
+    else if (score >= 25) verdict = 'caution';
+    else verdict = 'proceed';
+
+    const scamTypeCandidates = matchedCategories.filter(c => c.id !== 'urgency_pressure');
+    scamTypeCandidates.sort((a, b) => (b.weight * b.hits) - (a.weight * a.hits));
+
+    if (reasons.length === 0) {
+      reasons.push("We didn't spot any known scam patterns in the chat — but it's always worth running through the checklist below.");
+    }
+
+    return { score, verdict, sentences, scamTypes: scamTypeCandidates, reasons };
+  }
+
+  const VERDICT_META = {
+    proceed: { icon: '🎉', title: 'Proceed', sub: "No major red flags — nice! Still stay alert and trust your gut.", cls: 'verdict-proceed' },
+    caution: { icon: '🤔', title: 'Caution', sub: "Some things don't add up here. Slow down and double-check before you send any money.", cls: 'verdict-caution' },
+    stop: { icon: '🚨', title: 'Do Not Proceed', sub: "This has strong scam signals — we really wouldn't go through with this one.", cls: 'verdict-stop' }
+  };
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function render(report) {
+    const meta = VERDICT_META[report.verdict];
+    const banner = document.getElementById('verdictBanner');
+    banner.className = `verdict-banner ${meta.cls}`;
+    document.getElementById('verdictIcon').textContent = meta.icon;
+    document.getElementById('verdictTitle').textContent = `${meta.title} — risk score ${report.score}/100`;
+    document.getElementById('verdictSub').textContent = meta.sub;
+
+    const tagsEl = document.getElementById('scamTags');
+    if (report.scamTypes.length === 0) {
+      tagsEl.innerHTML = `<span class="scam-tag none">No specific scam pattern detected 👍</span>`;
+    } else {
+      tagsEl.innerHTML = report.scamTypes.map(c => `<span class="scam-tag">${c.label}</span>`).join('');
+    }
+
+    document.getElementById('reasonList').innerHTML = report.reasons.map(r => `<li>${r}</li>`).join('');
+
+    document.getElementById('chatRender').innerHTML = report.sentences.map(s => {
+      const safeText = escapeHtml(s.text);
+      if (!s.category) return `<span class="chat-line">${safeText}</span>`;
+      const isHigh = s.category.severity === 'high';
+      const cls = isHigh ? 'flag-high' : 'flag-med';
+      const badge = isHigh ? '🚩 ' : '👀 ';
+      return `<span class="chat-line"><span class="flag-sentence ${cls}" title="${escapeHtml(s.category.label)}: ${escapeHtml(s.category.reason)}">${badge}${safeText}</span></span>`;
+    }).join('');
+
+    document.getElementById('checklist').innerHTML = SAFETY_CHECKLIST.map(item =>
+      `<li><span class="check">✓</span><span>${item}</span></li>`
+    ).join('');
+
+    document.getElementById('reportSection').style.display = 'block';
+    document.getElementById('reportSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  document.getElementById('analyzeBtn').addEventListener('click', () => {
+    const inputs = {
+      chatText: document.getElementById('chatText').value,
+      salePrice: parseFloat(document.getElementById('salePrice').value) || 0,
+      marketPrice: parseFloat(document.getElementById('marketPrice').value) || 0,
+      paymentMethod: document.getElementById('paymentMethod').value,
+      txnMethod: document.getElementById('txnMethod').value
+    };
+    const report = computeReport(inputs);
+    render(report);
+  });
+</script>
+
+</body>
+</html>
